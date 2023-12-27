@@ -6,4 +6,20 @@ const guidGenerator = () => {
     return (s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4());
 }
 
-export { guidGenerator };
+const roomIdGenerator = () => {
+    const alphabetGen = () => {
+        return (Math.random() * (26 - 1) + 1)
+    }
+
+    const roomId = String.fromCharCode(
+        alphabetGen(),
+        alphabetGen(),
+        alphabetGen(),
+        alphabetGen(),
+        alphabetGen()
+    );
+
+    return roomId;
+}
+
+export { guidGenerator, roomIdGenerator };

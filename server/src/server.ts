@@ -6,6 +6,12 @@ import { Server } from 'socket.io';
 import log from './middleware/log';
 import { userRoutes } from './routes/user';
 
+type Room = {
+    id: string;
+    owner: string;
+    members: string[];
+}
+
 dotenv.config();
 
 const SERVER_PORT = process.env.SERVER_PORT ?? 4000;
@@ -24,12 +30,45 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(log);
 
+let rooms: Room[] = [];
+
 io.on('connection', socket => {
-    console.log('User Joined');
+    console.log(socket.id, 'connected');
+
+    socket.on('create-room', (room: Room) => {
+
+        rooms.push(room);
+        socket.join(room.id);
+
+        // DEGUGGING/LOGGING
+        console.log(room.owner, socket.id, 'created and joined on room', room.id);
+    })
+
+    socket.on('leave-room', (room: Room, username: string) => {
+        const isOwner = rooms.find(room => room.owner === username);
+
+        if (isOwner) {
+            // Removing the complete room from rooms list
+            rooms = rooms.filter(prevRooms => prevRooms.owner !== room.owner);
+        } else {
+            // Removing just the member from the room members list
+            rooms = rooms.map(room => {
+                return room.members.find(member => member === socket.id)
+                    ? { ...room, members: room.members.filter(member => member !== socket.id) }
+                    : room
+            })
+
+        }
+
+        socket.leave(room.id)
+
+        // DEGUGGING
+        console.log(username, socket.id, 'left room', room.id);
+    })
 
     socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
+        console.log(socket.id, 'disconnected');
+    })
 })
 
 // Routes
