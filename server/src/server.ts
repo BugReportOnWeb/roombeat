@@ -5,12 +5,8 @@ import { Server } from 'socket.io';
 
 import log from './middleware/log';
 import { userRoutes } from './routes/user';
-
-type Room = {
-    id: string;
-    owner: string;
-    members: string[];
-}
+import { Room } from './types/room';
+// import { createRoom, leaveRoom } from './socket/events';
 
 dotenv.config();
 
@@ -33,24 +29,23 @@ app.use(log);
 let rooms: Room[] = [];
 
 io.on('connection', socket => {
-    let currenUser = ''
+    let currentUser = ''
     console.log(socket.id, 'connected');
 
     socket.on('create-room', (room: Room) => {
         rooms.push(room);
-        currenUser = room.owner;
+        currentUser = room.owner;
         socket.join(room.id);
 
         // DEGUGGING/LOGGING
-        console.log(room.owner, socket.id, 'created and joined on room', room.id);
+        console.log(room.owner, socket.id, 'created and joined room', room.id);
     })
 
     socket.on('leave-room', (room: Room) => {
-        const isOwner = room.owner === currenUser;
+        const isOwner = room.owner === currentUser;
 
         if (isOwner) {
             // Removing the complete room from rooms list
-            console.log('here');
             rooms = rooms.filter(prevRoom => prevRoom.owner !== room.owner);
         } else {
             // Removing just the member from the room members list
@@ -64,12 +59,16 @@ io.on('connection', socket => {
         socket.leave(room.id)
 
         // DEGUGGING
-        console.log(currenUser, socket.id, 'left room', room.id);
+        console.log(currentUser, socket.id, 'left room', room.id);
     })
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');
     })
+
+    // TODO: Try something like this in future
+    // socket.on('create-room', (room: Room) => createRoom(socket, rooms, currentUser, room));
+    // socket.on('leave-room', (room: Room) => leaveRoom(socket, rooms, currentUser, room));
 })
 
 // Routes
