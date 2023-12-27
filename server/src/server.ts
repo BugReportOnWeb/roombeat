@@ -41,6 +41,24 @@ io.on('connection', socket => {
         console.log(room.owner, socket.id, 'created and joined room', room.id);
     })
 
+    socket.on('join-room', (roomId: string, username: string) => {
+        currentUser = username;
+
+        // Add currentUser to specified room members list 
+        // TODO: Have some kind of util for these types of array operations
+        rooms = rooms.map(room => {
+            return room.id === roomId
+                ? {...room, members: [...room.members, currentUser]}
+                : room
+        })
+
+        socket.join(roomId);
+        console.log(currentUser, socket.id, 'joined room', roomId);
+
+        const room = rooms.find(room => room.id === roomId);
+        socket.emit('join-room', room);
+    })
+
     socket.on('leave-room', (room: Room) => {
         const isOwner = room.owner === currentUser;
 
@@ -64,6 +82,10 @@ io.on('connection', socket => {
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');
+    })
+
+    socket.on('testing-send-message', (message: string, room: Room) => {
+        io.to(room.id).emit('testing-send-message', message);
     })
 
     // TODO: Try something like this in future
