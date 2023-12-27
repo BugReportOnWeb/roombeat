@@ -33,23 +33,25 @@ app.use(log);
 let rooms: Room[] = [];
 
 io.on('connection', socket => {
+    let currenUser = ''
     console.log(socket.id, 'connected');
 
     socket.on('create-room', (room: Room) => {
-
         rooms.push(room);
+        currenUser = room.owner;
         socket.join(room.id);
 
         // DEGUGGING/LOGGING
         console.log(room.owner, socket.id, 'created and joined on room', room.id);
     })
 
-    socket.on('leave-room', (room: Room, username: string) => {
-        const isOwner = rooms.find(room => room.owner === username);
+    socket.on('leave-room', (room: Room) => {
+        const isOwner = room.owner === currenUser;
 
         if (isOwner) {
             // Removing the complete room from rooms list
-            rooms = rooms.filter(prevRooms => prevRooms.owner !== room.owner);
+            console.log('here');
+            rooms = rooms.filter(prevRoom => prevRoom.owner !== room.owner);
         } else {
             // Removing just the member from the room members list
             rooms = rooms.map(room => {
@@ -57,13 +59,12 @@ io.on('connection', socket => {
                     ? { ...room, members: room.members.filter(member => member !== socket.id) }
                     : room
             })
-
         }
 
         socket.leave(room.id)
 
         // DEGUGGING
-        console.log(username, socket.id, 'left room', room.id);
+        console.log(currenUser, socket.id, 'left room', room.id);
     })
 
     socket.on('disconnect', () => {

@@ -26,10 +26,10 @@ const App = () => {
         socket.connect().emit('create-room', room);
     }
 
-    const leaveRoom = (room: Room, username: string) => {
+    const leaveRoom = (room: Room) => {
         setJoinedRoom(null);
         setUsername('');
-        socket.emit('leave-room', room, username).disconnect();
+        socket.emit('leave-room', room).disconnect();
     }
 
     useEffect(() => {
@@ -69,7 +69,7 @@ const App = () => {
             {joinedRoom && (
                 <>
                     <h1>{username}- {joinedRoom.id} - {String(isConnected)}</h1>
-                    <button onClick={() => leaveRoom(joinedRoom, username)} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave Room</button>
+                    <button onClick={() => leaveRoom(joinedRoom)} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave Room</button>
                 </>
             )}
         </>
