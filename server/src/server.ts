@@ -35,7 +35,9 @@ io.on('connection', socket => {
     socket.on('create-room', (room: Room) => {
         rooms.push(room);
         currentUser = room.owner;
+
         socket.join(room.id);
+        io.to(room.id).emit('join-room', room);
 
         // DEGUGGING/LOGGING
         console.log(room.owner, socket.id, 'created and joined room', room.id);
@@ -53,9 +55,9 @@ io.on('connection', socket => {
                 : room
         })
 
-        const room = rooms.find(room => room.id === roomId);
+        const updatedRoom = rooms.find(room => room.id === roomId);
         socket.join(roomId);
-        socket.emit('join-room', room);
+        io.to(roomId).emit('join-room', updatedRoom);
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'joined room', roomId);
@@ -86,7 +88,9 @@ io.on('connection', socket => {
             })
         }
 
+        const updatedRoom = rooms.find(prevRoom => prevRoom.id === room.id);
         socket.leave(room.id)
+        io.to(room.id).emit('leave-room', updatedRoom);
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'left room', room.id);

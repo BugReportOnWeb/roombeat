@@ -28,7 +28,6 @@ const App = () => {
             members: [username]
         }
 
-        setJoinedRoom(room);
         socket.connect().emit('create-room', room);
     }
 
@@ -66,8 +65,12 @@ const App = () => {
             setIsConnected(false);
         }
 
-        const onJoinRoom = (room: Room) => {
-            setJoinedRoom(room);
+        const onJoinRoom = (updatedRoom: Room) => {
+            setJoinedRoom(updatedRoom);
+        }
+
+        const onLeaveRoom = (updatedRoom: Room) => {
+            setJoinedRoom(updatedRoom);
         }
 
         const onSendMessage = (message: string) => {
@@ -81,6 +84,7 @@ const App = () => {
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('join-room', onJoinRoom);
+        socket.on('leave-room', onLeaveRoom);
         socket.on('testing-send-message', onSendMessage);
 
         return () => {
@@ -126,8 +130,13 @@ const App = () => {
                         className='bg-transparent border border-gray-500 px-3 py-2 text-sm rounded-lg'
                     />
                     <button onClick={sendMessage} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Send Message</button>
-                    {messages.map(message => (
-                        <h1>{message}</h1>
+                    <h1>Joined Members so far:</h1>
+                    {joinedRoom.members.map((member, index) => (
+                        <h1 key={index}>{member}</h1>
+                    ))}
+                    <hr />
+                    {messages.map((message, index) => (
+                        <h1 key={index}>{message}</h1>
                     ))}
                 </div>
             )}
