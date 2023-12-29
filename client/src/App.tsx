@@ -13,11 +13,13 @@ const App = () => {
     const [joinedRoom, setJoinedRoom] = useState<Room | null>(null);
 
     const [username, setUsername] = useState('');
-    const [roomId, setRoomId] = useState('');
+    const [inputRoomId, setInputRoomId] = useState('');
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState<string[]>([]);
 
     const createRoom = () => {
+        // TODO: Handle form validation errors
+        // - Empty or short username
         const roomId = roomIdGenerator();
 
         const room = {
@@ -31,13 +33,20 @@ const App = () => {
     }
 
     const joinRoom = () => {
-        socket.connect().emit('join-room', roomId, username);
+        // TODO: Handle form validation errors
+        // - Empty or short or already existing (in room) username
+        // - Non-existing room ID or empty ID
+
+        setInputRoomId(inputRoomId.trim());
+        socket.connect().emit('join-room', inputRoomId.trim(), username);
     }
 
     const leaveRoom = (room: Room) => {
+        // Removing everything in the state
         setJoinedRoom(null);
         setUsername('');
-        setRoomId('');
+        setInputRoomId('');
+        setMessages([]);
 
         socket.emit('leave-room', room).disconnect();
     }
@@ -45,6 +54,7 @@ const App = () => {
     // FOR TESTING PURPOSE
     const sendMessage = () => {
         socket.emit('testing-send-message', message, joinedRoom);
+        setMessage('');
     }
 
     useEffect(() => {
@@ -61,7 +71,6 @@ const App = () => {
         }
 
         const onSendMessage = (message: string) => {
-            setMessage('');
             setMessages(prevMessage => {
                 return prevMessage
                     ? [...prevMessage, message]
@@ -97,8 +106,8 @@ const App = () => {
                     <input
                         type='text'
                         placeholder='Room ID'
-                        value={roomId}
-                        onChange={(e) => setRoomId(e.target.value)}
+                        value={inputRoomId}
+                        onChange={(e) => setInputRoomId(e.target.value)}
                         className='bg-transparent border border-gray-500 px-3 py-2 text-sm rounded-lg'
                     />
                     <button onClick={createRoom} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Create Room</button>
@@ -112,6 +121,7 @@ const App = () => {
                     <button onClick={() => leaveRoom(joinedRoom)} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave Room</button>
                     <input
                         onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Message..."
                         value={message}
                         className='bg-transparent border border-gray-500 px-3 py-2 text-sm rounded-lg'
                     />

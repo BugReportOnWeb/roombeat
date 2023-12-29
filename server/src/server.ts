@@ -39,6 +39,7 @@ io.on('connection', socket => {
 
         // DEGUGGING/LOGGING
         console.log(room.owner, socket.id, 'created and joined room', room.id);
+        console.log(rooms);
     })
 
     socket.on('join-room', (roomId: string, username: string) => {
@@ -48,36 +49,48 @@ io.on('connection', socket => {
         // TODO: Have some kind of util for these types of array operations
         rooms = rooms.map(room => {
             return room.id === roomId
-                ? {...room, members: [...room.members, currentUser]}
+                ? { ...room, members: [...room.members, currentUser] }
                 : room
         })
 
-        socket.join(roomId);
-        console.log(currentUser, socket.id, 'joined room', roomId);
-
         const room = rooms.find(room => room.id === roomId);
+        socket.join(roomId);
         socket.emit('join-room', room);
+
+        // DEGUGGING/LOGGING
+        console.log(currentUser, socket.id, 'joined room', roomId);
+        console.log(rooms);
     })
 
     socket.on('leave-room', (room: Room) => {
-        const isOwner = room.owner === currentUser;
+        // TODO: Add a condition:
+        // If the user is the last in the room to leave, the room gets removed/deleted
 
-        if (isOwner) {
-            // Removing the complete room from rooms list
-            rooms = rooms.filter(prevRoom => prevRoom.owner !== room.owner);
+        if (currentUser === room.owner) {
+            // Removing the complete room from rooms list if it's the owner
+            // Might remove later, not much sure about this approach
+            rooms = rooms.filter(prevRoom => prevRoom.id !== room.id);
         } else {
             // Removing just the member from the room members list
-            rooms = rooms.map(room => {
-                return room.members.find(member => member === socket.id)
-                    ? { ...room, members: room.members.filter(member => member !== socket.id) }
-                    : room
+            rooms = rooms.map(prevRoom => {
+                if (prevRoom.id === room.id) {
+                    const updatedMembers = prevRoom.members.filter(member => {
+                        return member !== currentUser
+                    })
+
+                    const updatedRoom: Room = { ...prevRoom, members: updatedMembers };
+                    return updatedRoom;
+                } else {
+                    return prevRoom;
+                }
             })
         }
 
         socket.leave(room.id)
 
-        // DEGUGGING
+        // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'left room', room.id);
+        console.log(rooms);
     })
 
     socket.on('disconnect', () => {
