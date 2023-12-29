@@ -2,11 +2,10 @@ import express from 'express';
 import * as dotenv from 'dotenv';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import cors from 'cors';
 
 import log from './middleware/log';
-import { userRoutes } from './routes/user';
 import { Room } from './types/room';
-// import { createRoom, leaveRoom } from './socket/events';
 
 dotenv.config();
 
@@ -23,6 +22,7 @@ const io = new Server(server, {
 });
 
 // Middlewares
+app.use(cors());
 app.use(express.json());
 app.use(log);
 
@@ -33,8 +33,14 @@ io.on('connection', socket => {
     console.log(socket.id, 'connected');
 
     socket.on('create-room', (room: Room) => {
-        rooms.push(room);
+        // Username validation 
+        if (!room.owner || room.owner.length < 2) {
+            socket.disconnect();
+            return;
+        };
+
         currentUser = room.owner;
+        rooms.push(room);
 
         socket.join(room.id);
         io.to(room.id).emit('join-room', room);
@@ -45,10 +51,22 @@ io.on('connection', socket => {
     })
 
     socket.on('join-room', (roomId: string, username: string) => {
-        currentUser = username;
+        const room = rooms.find(room => room.id === roomId);
+        const user = rooms.find(room => (
+            room.members.find(member => member === username)
+        ));
 
-        // Add currentUser to specified room members list 
-        // TODO: Have some kind of util for these types of array operations
+        if (
+            !username || username.length < 2 ||
+            !roomId || roomId.length < 5 ||
+            !room || user
+        ) {
+            socket.disconnect();
+            return;
+        }
+
+        // TODO?: Have some kind of util for these types of array operations
+        currentUser = username;
         rooms = rooms.map(room => {
             return room.id === roomId
                 ? { ...room, members: [...room.members, currentUser] }
@@ -101,17 +119,39 @@ io.on('connection', socket => {
         console.log(socket.id, 'disconnected');
     })
 
-    socket.on('testing-send-message', (message: string, room: Room) => {
-        io.to(room.id).emit('testing-send-message', message);
-    })
-
     // TODO: Try something like this in future
     // socket.on('create-room', (room: Room) => createRoom(socket, rooms, currentUser, room));
     // socket.on('leave-room', (room: Room) => leaveRoom(socket, rooms, currentUser, room));
 })
 
-// Routes
-app.use('/api/users', userRoutes);
+// Validation Routes
+app.get('/api/rooms/:roomId', (req, res) => {
+    const { roomId } = req.params;
+
+    const room = rooms.find(room => room.id === roomId);
+
+    if (!room) {
+        res.status(404).send({ error: 'Room doesn\'t exist' })
+        return;
+    }
+
+    res.send(room);
+})
+
+app.get('/api/users/:username', (req, res) => {
+    const { username } = req.params;
+
+    const user = rooms.find(room => {
+        return room.members.find(member => member === username);
+    })
+
+    if (!user) {
+        res.status(404).send({ error: 'User doesn\'t exist' })
+        return;
+    }
+
+    res.send(user)
+})
 
 server.listen(+SERVER_PORT, HOST, () => {
     console.log(`Server listening on port ${HOST}:${SERVER_PORT}`);

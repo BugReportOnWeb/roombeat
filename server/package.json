@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/BugReportOnWeb/roombeat#readme",
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "socket.io": "^4.7.2"
   },
