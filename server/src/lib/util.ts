@@ -8,7 +8,7 @@ const guidGenerator = () => {
 
 const roomIdGenerator = () => {
     const alphabetGen = () => {
-        return (Math.random() * (26 - 1) + 1)
+        return Math.floor((Math.random() * (26 - 1) + 1)) + 64;
     }
 
     const roomId = String.fromCharCode(

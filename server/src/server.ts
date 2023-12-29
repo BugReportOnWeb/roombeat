@@ -6,6 +6,7 @@ import cors from 'cors';
 
 import log from './middleware/log';
 import { Room } from './types/room';
+import { roomIdGenerator } from './lib/util';
 
 dotenv.config();
 
@@ -32,21 +33,27 @@ io.on('connection', socket => {
     let currentUser = ''
     console.log(socket.id, 'connected');
 
-    socket.on('create-room', (room: Room) => {
+    socket.on('create-room', (owner: string) => {
         // Username validation 
-        if (!room.owner || room.owner.length < 2) {
+        if (!owner || owner.length < 2) {
             socket.disconnect();
             return;
         };
 
-        currentUser = room.owner;
-        rooms.push(room);
+        const newRoom: Room = {
+            id: roomIdGenerator(),
+            owner: owner.trim(),
+            members: [owner.trim()]
+        }
 
-        socket.join(room.id);
-        io.to(room.id).emit('join-room', room);
+        currentUser = newRoom.owner;
+        rooms.push(newRoom);
+
+        socket.join(newRoom.id);
+        io.to(newRoom.id).emit('join-room', newRoom);
 
         // DEGUGGING/LOGGING
-        console.log(room.owner, socket.id, 'created and joined room', room.id);
+        console.log(newRoom.owner, socket.id, 'created and joined room', newRoom.id);
         console.log(rooms);
     })
 
@@ -82,18 +89,19 @@ io.on('connection', socket => {
         console.log(rooms);
     })
 
-    socket.on('leave-room', (room: Room) => {
+    socket.on('leave-room', (roomId: string) => {
         // TODO: Add a condition:
         // If the user is the last in the room to leave, the room gets removed/deleted
 
-        if (currentUser === room.owner) {
-            // Removing the complete room from rooms list if it's the owner
-            // Might remove later, not much sure about this approach
-            rooms = rooms.filter(prevRoom => prevRoom.id !== room.id);
+        // Removing the complete room from rooms list if it's the owner
+        // Might remove later, not much sure about this approach
+        const roomOwner = rooms.find(room => room.id === roomId)?.owner;
+        if (currentUser === roomOwner) {
+            rooms = rooms.filter(prevRoom => prevRoom.id !== roomId);
         } else {
             // Removing just the member from the room members list
             rooms = rooms.map(prevRoom => {
-                if (prevRoom.id === room.id) {
+                if (prevRoom.id === roomId) {
                     const updatedMembers = prevRoom.members.filter(member => {
                         return member !== currentUser
                     })
@@ -106,12 +114,12 @@ io.on('connection', socket => {
             })
         }
 
-        const updatedRoom = rooms.find(prevRoom => prevRoom.id === room.id);
-        socket.leave(room.id)
-        io.to(room.id).emit('leave-room', updatedRoom);
+        const updatedRoom = rooms.find(prevRoom => prevRoom.id === roomId);
+        socket.leave(roomId)
+        io.to(roomId).emit('leave-room', updatedRoom);
 
         // DEGUGGING/LOGGING
-        console.log(currentUser, socket.id, 'left room', room.id);
+        console.log(currentUser, socket.id, 'left room', roomId);
         console.log(rooms);
     })
 
