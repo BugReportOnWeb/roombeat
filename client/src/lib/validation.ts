@@ -1,9 +1,9 @@
 const validateUsername = (username: string) => {
-    if (!username) {
+    if (!username.trim()) {
         const error = 'Invalid username.';
         return error;
     }
-    if (username.length < 2) {
+    if (username.trim().length < 2) {
         const error = 'Username must be at least 2 characters.';
         return error;
     }
@@ -27,20 +27,20 @@ const validateRoomId = async (
     roomId: string | undefined
 ) => {
     // Length: Only when using 'roomIdGeneretor()'
-    if (!roomId || roomId.length < 5) {
+    if (!roomId?.trim() || roomId.trim().length < 5) {
         const error = 'Invalid Room ID';
         return error;
     }
 
     const room = await checkAvailableRoom(roomId);
     if (!room) {
-        const error = `Room '${roomId}' doens't exist`;
+        const error = `Room '${roomId}' doesn't exist`;
         return error;
     }
 
     const member = await checkExistingMember(username);
     if (member) {
-        const error = `Username '${username}' already exist in room '${roomId}'`;
+        const error = `Username '${username}' unavailable for room '${roomId}'`;
         return error;
     }
 }

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { socket } from "./socket/socket";
-import { roomIdGenerator } from "./lib/util";
 import { Room } from "./types/room";
 import RoomDash from "./components/RoomDash";
 import Error from "./components/Error";
@@ -26,14 +25,8 @@ const App = () => {
             return;
         }
 
-        const newRoom = {
-            id: roomIdGenerator(),
-            owner: username.trim(),
-            members: [username.trim()]
-        }
-
         socket.connect()
-        socket.emit('create-room', newRoom);
+        socket.emit('create-room', username);
     }
 
     const joinRoom = async () => {
@@ -57,7 +50,7 @@ const App = () => {
 
     const leaveRoom = () => {
         resetStates();
-        socket.emit('leave-room', room)
+        socket.emit('leave-room', room?.id)
         socket.disconnect();
     }
 
@@ -70,6 +63,7 @@ const App = () => {
             // Used only when room gets deleted when owner leaves
             // If that functionality is changed, remove this
             if (!updatedRoom) {
+                socket.disconnect();
                 resetStates();
                 return;
             }
