@@ -1,34 +1,28 @@
 import { useEffect, useState } from "react";
 import { socket } from "./socket/socket";
 import { roomIdGenerator } from "./lib/util";
-
-type Room = {
-    id: string;
-    owner: string;
-    members: string[];
-}
+import { Room } from "./types/room";
+import RoomDash from "./components/RoomDash";
 
 const App = () => {
     const [isConnected, setIsConnected] = useState(socket.connected);
-    const [joinedRoom, setJoinedRoom] = useState<Room | null>(null);
+    const [room, setRoom] = useState<Room | null>(null);
 
     const [username, setUsername] = useState('');
     const [inputRoomId, setInputRoomId] = useState('');
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState<string[]>([]);
 
     const createRoom = () => {
         // TODO: Handle form validation errors
         // - Empty or short username
         const roomId = roomIdGenerator();
 
-        const room = {
+        const newRoom = {
             id: roomId,
             owner: username,
             members: [username]
         }
 
-        socket.connect().emit('create-room', room);
+        socket.connect().emit('create-room', newRoom);
     }
 
     const joinRoom = () => {
@@ -40,20 +34,13 @@ const App = () => {
         socket.connect().emit('join-room', inputRoomId.trim(), username);
     }
 
-    const leaveRoom = (room: Room) => {
+    const leaveRoom = () => {
         // Removing everything in the state
-        setJoinedRoom(null);
+        setRoom(null);
         setUsername('');
         setInputRoomId('');
-        setMessages([]);
 
         socket.emit('leave-room', room).disconnect();
-    }
-
-    // FOR TESTING PURPOSE
-    const sendMessage = () => {
-        socket.emit('testing-send-message', message, joinedRoom);
-        setMessage('');
     }
 
     useEffect(() => {
@@ -66,38 +53,29 @@ const App = () => {
         }
 
         const onJoinRoom = (updatedRoom: Room) => {
-            setJoinedRoom(updatedRoom);
+            setRoom(updatedRoom);
         }
 
         const onLeaveRoom = (updatedRoom: Room) => {
-            setJoinedRoom(updatedRoom);
-        }
-
-        const onSendMessage = (message: string) => {
-            setMessages(prevMessage => {
-                return prevMessage
-                    ? [...prevMessage, message]
-                    : [message]
-            })
+            setRoom(updatedRoom);
         }
 
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('join-room', onJoinRoom);
         socket.on('leave-room', onLeaveRoom);
-        socket.on('testing-send-message', onSendMessage);
 
         return () => {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
             socket.off('join-room', onJoinRoom);
-            socket.off('testing-send-message', onSendMessage);
+            socket.off('leave-room', onLeaveRoom);
         }
     }, [])
 
     return (
         <>
-            {!joinedRoom && (
+            {!room && (
                 <div className='flex flex-col gap-2 w-fit'>
                     <h1>Hello World - {String(isConnected)}</h1>
                     <input
@@ -119,27 +97,7 @@ const App = () => {
                 </div>
             )}
 
-            {joinedRoom && (
-                <div className='flex flex-col gap-3 w-fit'>
-                    <h1>{username}- {joinedRoom.id} - {String(isConnected)}</h1>
-                    <button onClick={() => leaveRoom(joinedRoom)} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave Room</button>
-                    <input
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Message..."
-                        value={message}
-                        className='bg-transparent border border-gray-500 px-3 py-2 text-sm rounded-lg'
-                    />
-                    <button onClick={sendMessage} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Send Message</button>
-                    <h1>Joined Members so far:</h1>
-                    {joinedRoom.members.map((member, index) => (
-                        <h1 key={index}>{member}</h1>
-                    ))}
-                    <hr />
-                    {messages.map((message, index) => (
-                        <h1 key={index}>{message}</h1>
-                    ))}
-                </div>
-            )}
+            {room && <RoomDash username={username} room={room} leaveRoom={leaveRoom} />}
         </>
     )
 }
