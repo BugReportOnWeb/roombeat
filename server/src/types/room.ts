@@ -4,4 +4,10 @@ type Room = {
     members: string[];
 }
 
-export { Room };
+type TokenDetails = {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+}
+
+export { Room, TokenDetails };

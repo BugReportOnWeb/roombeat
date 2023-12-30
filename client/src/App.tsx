@@ -18,15 +18,29 @@ const App = () => {
         setError('');
     }
 
-    const createRoom = () => {
-        const usernameError = validateUsername(username);
-        if (usernameError) {
-            setError(usernameError);
-            return;
+    const createRoom = async () => {
+        // This gets the spotify auth page URL
+        // TODO: shift to 'validateUser'
+        try {
+            const res = await fetch('http://localhost:3000/api/spotify/auth');
+            const data = await res.json();
+            console.log(data);
+            document.location = data.authURL;
+        } catch (error) {
+            console.error(error);
         }
 
-        socket.connect()
-        socket.emit('create-room', username);
+        // Original content of createing room
+        // Called from useEffect when checked for queryString values
+          
+        // const usernameError = validateUsername(username);
+        // if (usernameError) {
+        //     setError(usernameError);
+        //     return;
+        // }
+
+        // socket.connect()
+        // socket.emit('create-room', username);
     }
 
     const joinRoom = async () => {
@@ -55,6 +69,16 @@ const App = () => {
     }
 
     useEffect(() => {
+        // TODO: Use this with a checker
+        // Redirect to original router (router-dom) if queryString
+        // Change state values with username, room and fetched data
+        const queryString = window.location.search;
+        const params = new URLSearchParams(queryString);
+
+        const testing = params.get('testing');
+        const username =  params.get('username');
+        console.log({ testing, username });
+
         const onJoinRoom = (updatedRoom: Room) => {
             setRoom(updatedRoom);
         }

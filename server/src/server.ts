@@ -1,5 +1,8 @@
 import express from 'express';
+
 import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -7,12 +10,14 @@ import cors from 'cors';
 import log from './middleware/log';
 import { Room } from './types/room';
 import { roomIdGenerator } from './lib/util';
-
-dotenv.config();
+import { getSpotifyAcessToken, getSpotifyProfileData } from './lib/spotify';
 
 const SERVER_PORT = process.env.SERVER_PORT ?? 4000;
 const CLIENT_PORT = process.env.CLIENT_PORT ?? 5173;
 const HOST = process.env.HOST ?? 'localhost';
+
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID as string;
+const REDIRECT_URI = process.env.REDIRECT_URI as string;
 
 const app = express();
 const server = createServer(app);
@@ -29,16 +34,26 @@ app.use(log);
 
 let rooms: Room[] = [];
 
+
+// ------------------
+// SOCKET STUFF HERE
+// ------------------
+
+
 io.on('connection', socket => {
     let currentUser = ''
     console.log(socket.id, 'connected');
 
-    socket.on('create-room', (owner: string) => {
+    socket.on('create-room', async (owner: string) => {
         // Username validation 
         if (!owner || owner.length < 2) {
             socket.disconnect();
             return;
         };
+
+        const tokenDetails = await getSpotifyAcessToken();
+        const profileData = await getSpotifyProfileData(tokenDetails);
+        console.log(profileData);
 
         const newRoom: Room = {
             id: roomIdGenerator(),
@@ -130,6 +145,51 @@ io.on('connection', socket => {
     // TODO: Try something like this in future
     // socket.on('create-room', (room: Room) => createRoom(socket, rooms, currentUser, room));
     // socket.on('leave-room', (room: Room) => leaveRoom(socket, rooms, currentUser, room));
+})
+
+
+// ------------------
+// ROUTING STUFF HERE
+// ------------------
+
+let username = '';
+
+app.get('/api/spotify/auth', async (_req, res) => {
+    username = 'Dev';
+    const params = new URLSearchParams();
+    params.append('client_id', SPOTIFY_CLIENT_ID);
+    params.append('response_type', 'code');
+    params.append('scope', 'user-read-private user-read-email');
+    params.append('redirect_uri', REDIRECT_URI);
+
+    const URL = `https://accounts.spotify.com/authorize?${params.toString()}`;
+
+    try {
+        const result = await fetch(URL);
+        const authURL = result.url;
+
+        if (!result.ok) {
+            throw new Error('Some error occured');
+        }
+
+        console.log(authURL);
+        res.send({ authURL });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(409).send(error.message);
+        }
+    }
+})
+
+
+app.get('/api/spotify/', (req, res) => {
+    console.log('code', req.query);
+
+    const params = new URLSearchParams();
+    params.append('testing', 'working');
+    params.append('username', username);
+
+    res.redirect(`http://localhost:5173?${params.toString()}`);
 })
 
 // Validation Routes
