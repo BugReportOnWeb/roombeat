@@ -1,5 +1,6 @@
 import { Room } from "../types/room";
 import Members from "./Members";
+import SpotifyData from "./SpotifyData";
 
 type RoomProps = {
     username: string;
@@ -13,6 +14,7 @@ const RoomDash = ({ username, room, leaveRoom }: RoomProps) => {
             <h1>{username} - {room.id}</h1>
             <button onClick={leaveRoom} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave RoomDash</button>
             <Members members={room.members} />
+            <SpotifyData />
         </div>
     )
 }

@@ -1,16 +1,22 @@
+// Core
 import { useEffect, useRef, useState } from "react";
-import { socket } from "./socket/socket";
-import { Room } from "./types/room";
+import { useNavigate } from 'react-router-dom';
+
+// Components
 import RoomDash from "./components/RoomDash";
-import Error from "./components/Error";
+import ErrorBlock from "./components/ErrorBlock";
+
+// Extras
+import { Room } from "./types/room";
+import { socket } from "./socket/socket";
 import { validateRoomId, validateUsername } from "./lib/validation";
 
 const App = () => {
     const [room, setRoom] = useState<Room | null>(null);
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
-
     const roomIdRef = useRef<HTMLInputElement | null>(null);
+    const navigate = useNavigate();
 
     const resetStates = () => {
         setRoom(null);
@@ -18,29 +24,29 @@ const App = () => {
         setError('');
     }
 
-    const createRoom = async () => {
-        // This gets the spotify auth page URL
-        // TODO: shift to 'validateUser'
-        try {
-            const res = await fetch('http://localhost:3000/api/spotify/auth');
-            const data = await res.json();
-            console.log(data);
-            document.location = data.authURL;
-        } catch (error) {
-            console.error(error);
+    const validateUser = async () => {
+        const usernameError = validateUsername(username);
+        if (usernameError) {
+            setError(usernameError);
+            return;
         }
 
-        // Original content of createing room
-        // Called from useEffect when checked for queryString values
-          
-        // const usernameError = validateUsername(username);
-        // if (usernameError) {
-        //     setError(usernameError);
-        //     return;
-        // }
+        try {
+            const res = await fetch(`http://localhost:3000/api/spotify/auth?username=${username}`);
+            const data = await res.json();
+            document.location = data.authURL;
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error(error.message);
+                setError(`${error.message}: Can't reach spotify auth page`);
+            }
+        }
+    }
 
-        // socket.connect()
-        // socket.emit('create-room', username);
+    // Socket room related functions
+    const createRoom = async (username: string) => {
+        socket.connect()
+        socket.emit('create-room', username);
     }
 
     const joinRoom = async () => {
@@ -69,15 +75,22 @@ const App = () => {
     }
 
     useEffect(() => {
-        // TODO: Use this with a checker
-        // Redirect to original router (router-dom) if queryString
-        // Change state values with username, room and fetched data
         const queryString = window.location.search;
         const params = new URLSearchParams(queryString);
+        const authUsername = params.get('username');
+        const authError = params.get('error');
 
-        const testing = params.get('testing');
-        const username =  params.get('username');
-        console.log({ testing, username });
+        if (authError) {
+            console.error(authError);
+            setError(`${authError}: Auth error occured`);
+            navigate('/');
+        }
+
+        if (authUsername) {
+            setUsername(authUsername);
+            createRoom(authUsername);
+            navigate('/');
+        }
 
         const onJoinRoom = (updatedRoom: Room) => {
             setRoom(updatedRoom);
@@ -102,7 +115,7 @@ const App = () => {
             socket.off('join-room', onJoinRoom);
             socket.off('leave-room', onLeaveRoom);
         }
-    }, [])
+    }, [navigate])
 
     return (
         <>
@@ -122,13 +135,17 @@ const App = () => {
                         ref={roomIdRef}
                         className='bg-transparent border border-gray-500 px-3 py-2 text-sm rounded-lg'
                     />
-                    <button onClick={createRoom} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Create Room</button>
+                    <button onClick={validateUser} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Create Room</button>
                     <button onClick={joinRoom} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Join Room</button>
-                    {error && <Error error={error} />}
+                    {error && <ErrorBlock error={error} />}
                 </div>
             )}
 
-            {room && <RoomDash username={username} room={room} leaveRoom={leaveRoom} />}
+            {room && <RoomDash
+                username={username}
+                room={room}
+                leaveRoom={leaveRoom}
+            />}
         </>
     )
 }
