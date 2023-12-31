@@ -11,7 +11,8 @@ dotenv.config();
 import log from './middleware/log';
 import { Room } from './types/room';
 import { roomIdGenerator } from './lib/util';
-import { getSpotifyUserDetails } from './lib/spotify';
+import { getSpotifyPlaybackData, getSpotifyUserData } from './lib/spotify';
+import { SpotifyData } from './types/spotify';
 
 const SERVER_PORT = process.env.SERVER_PORT as string;
 const CLIENT_PORT = process.env.CLIENT_PORT as string;
@@ -57,7 +58,10 @@ io.on('connection', socket => {
             id: roomIdGenerator(),
             owner: owner.trim(),
             members: [owner.trim()],
-            spotifyData: await getSpotifyUserDetails(authToken),
+            // spotify: {
+            //     user: await getSpotifyUserDetails(authToken),
+            //     playback: await getSpotifyPlaybackData(authToken)
+            // }
         }
 
         currentUser = newRoom.owner;
@@ -154,8 +158,20 @@ io.on('connection', socket => {
 
 let authUsername = '';
 // TODO: Store authTokem in a key-value form
-// owner - token
+// roomID - token
 let authToken = '';
+
+app.get('/api/spotify/data', async (_req, res) => {
+    try {
+        const user = await getSpotifyUserData(authToken);
+        const playback = await getSpotifyPlaybackData(authToken);
+        const spotifyData: SpotifyData = { user, playback }
+
+        res.send(spotifyData);
+    } catch (error) {
+        throw error;
+    }
+});
 
 app.get('/api/spotify/auth', async (req, res) => {
     const { username } = req.query;
@@ -163,7 +179,7 @@ app.get('/api/spotify/auth', async (req, res) => {
     const params = new URLSearchParams();
     params.append('client_id', SPOTIFY_CLIENT_ID);
     params.append('response_type', 'code');
-    params.append('scope', 'user-read-private user-read-email');
+    params.append('scope', 'user-read-private user-read-email user-read-playback-state');
     params.append('redirect_uri', REDIRECT_URI);
 
     try {

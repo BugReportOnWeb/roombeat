@@ -1,16 +1,13 @@
-import { SpotifyData } from "./spotify";
+import { SpotifyUser, SpotifyPlayback } from "./spotify";
 
 type Room = {
     id: string;
     owner: string;
     members: string[];
-    spotifyData: SpotifyData;
+    spotify?: {
+        user: SpotifyUser;
+        playback?: SpotifyPlayback
+    }
 }
 
-type TokenDetails = {
-    access_token: string;
-    token_type: string;
-    expires_in: number;
-}
-
-export { Room, TokenDetails };
+export type { Room };
