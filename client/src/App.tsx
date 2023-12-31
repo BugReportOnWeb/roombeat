@@ -10,6 +10,7 @@ import ErrorBlock from "./components/ErrorBlock";
 import { Room } from "./types/room";
 import { socket } from "./socket/socket";
 import { validateRoomId, validateUsername } from "./lib/validation";
+import { getAuthURL } from "./lib/spotify";
 
 const App = () => {
     const [room, setRoom] = useState<Room | null>(null);
@@ -32,13 +33,11 @@ const App = () => {
         }
 
         try {
-            const res = await fetch(`http://localhost:3000/api/spotify/auth?username=${username}`);
-            const data = await res.json();
-            document.location = data.authURL;
+            const authURL = await getAuthURL(username);
+            document.location = authURL;
         } catch (error) {
             if (error instanceof Error) {
-                console.error(error.message);
-                setError(`${error.message}: Can't reach spotify auth page`);
+                setError(error.message);
             }
         }
     }
@@ -82,7 +81,7 @@ const App = () => {
 
         if (authError) {
             console.error(authError);
-            setError(`${authError}: Auth error occured`);
+            setError('Spotify auth failed');
             navigate('/');
         }
 

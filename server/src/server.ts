@@ -1,19 +1,20 @@
+// Core
 import express from 'express';
-
 import * as dotenv from 'dotenv';
-dotenv.config();
-
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 
+dotenv.config();
+
+// Extras
 import log from './middleware/log';
 import { Room } from './types/room';
 import { roomIdGenerator } from './lib/util';
 
-const SERVER_PORT = process.env.SERVER_PORT ?? 4000;
-const CLIENT_PORT = process.env.CLIENT_PORT ?? 5173;
-const HOST = process.env.HOST ?? 'localhost';
+const SERVER_PORT = process.env.SERVER_PORT as string;
+const CLIENT_PORT = process.env.CLIENT_PORT as string;
+const HOST = process.env.HOST as string;
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID as string;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET as string;
@@ -206,9 +207,7 @@ app.get('/api/spotify/', async (req, res) => {
         authToken = data.access_token;
         res.redirect(`http://localhost:5173?username=${authUsername}`);
     } catch (error) {
-        if (error instanceof Error) {
-            res.redirect(`http://localhost:5173?error=${error.message}`);
-        }
+        res.redirect(`http://localhost:5173?error=${error}`);
     }
 })
 
