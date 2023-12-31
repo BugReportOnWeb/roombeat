@@ -141,6 +141,19 @@ io.on('connection', socket => {
         console.log(rooms);
     })
 
+    socket.on('update-spotify-room', (updatedRoom: Room) => {
+        rooms = rooms.map(room => {
+            return room.id === updatedRoom.id
+                ? updatedRoom
+                : room
+        })
+
+        io.to(updatedRoom.id).emit('update-spotify-room', updatedRoom);
+
+        // DEGUGGING/LOGGING
+        console.log(rooms);
+    })
+
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');
     })

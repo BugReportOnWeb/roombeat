@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SpotifyData } from "../types/spotify";
+import { RoomContext } from "../context/RoomContext";
+import { RoomContextType } from "../types/room";
+import { socket } from "../socket/socket";
 
 type SpotifyDataBlockProp = {
-    spotify?: SpotifyData 
+    spotify?: SpotifyData
 }
 
 const SpotifyDataBlock = ({ spotify }: SpotifyDataBlockProp) => {
-    const [spotifyData, setSpotifyData] = useState<SpotifyData>();
+    const { room } = useContext(RoomContext) as RoomContextType;
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -19,8 +22,13 @@ const SpotifyDataBlock = ({ spotify }: SpotifyDataBlockProp) => {
                     throw new Error(data.error);
                 }
 
-                setSpotifyData(data);
+                const updatedRoom = {
+                    ...room!,
+                    spotify: data
+                }
+
                 setError('');
+                socket.emit('update-spotify-room', updatedRoom);
             } catch (error) {
                 if (error instanceof Error) {
                     console.error(error);
@@ -30,30 +38,32 @@ const SpotifyDataBlock = ({ spotify }: SpotifyDataBlockProp) => {
         }
 
         if (!spotify) fetchData();
-    }, [spotify])
+    }, [])
+
+    console.log(spotify);
 
     return (
         <>
-            {error && !spotifyData && (
+            {error && !spotify && (
                 <h1 className='text-red-500 font-sm'>{error}</h1>
             )}
-            {!error && spotifyData && (
+            {!error && spotify && (
                 <div className='flex flex-col gap-2'>
                     <div className='flex flex-col gap-1'>
                         <h1 className='text-bold'>User stuff</h1>
-                        <h1>{spotifyData.user.display_name}</h1>
-                        <h2>{spotifyData.user.email}</h2>
+                        <h1>{spotify.user.display_name}</h1>
+                        <h2>{spotify.user.email}</h2>
                     </div>
                     <div className='flex flex-col gap-1'>
                         <h1 className='text-bold'>Playback stuff</h1>
                         <img
-                            src={spotifyData.playback.images[1].url}
-                            width={spotifyData.playback.images[1].width}
-                            height={spotifyData.playback.images[1].height}
+                            src={spotify.playback.images[1].url}
+                            width={spotify.playback.images[1].width}
+                            height={spotify.playback.images[1].height}
                         />
-                        <h1>{spotifyData.playback.name}</h1>
-                        <h1>{spotifyData.playback.is_playing}</h1>
-                        <h1>{spotifyData.playback.device_name}</h1>
+                        <h1>{spotify.playback.name}</h1>
+                        <h1>{spotify.playback.is_playing}</h1>
+                        <h1>{spotify.playback.device_name}</h1>
                     </div>
                 </div>
             )}

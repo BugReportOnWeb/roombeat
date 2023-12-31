@@ -1,5 +1,5 @@
 // Core
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
 // Components
@@ -7,13 +7,14 @@ import RoomDash from "./components/RoomDash";
 import ErrorBlock from "./components/ErrorBlock";
 
 // Extras
-import { Room } from "./types/room";
+import { Room, RoomContextType } from "./types/room";
 import { socket } from "./socket/socket";
 import { validateRoomId, validateUsername } from "./lib/validation";
 import { getAuthURL } from "./lib/spotify";
+import { RoomContext } from "./context/RoomContext";
 
 const App = () => {
-    const [room, setRoom] = useState<Room | null>(null);
+    const { room, setRoom } = useContext(RoomContext) as RoomContextType;
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
     const roomIdRef = useRef<HTMLInputElement | null>(null);
@@ -107,14 +108,20 @@ const App = () => {
             setRoom(updatedRoom);
         }
 
+        const onUpdateSpotifyRoom = (updatedRoom: Room) => {
+            setRoom(updatedRoom);
+        }
+
         socket.on('join-room', onJoinRoom);
         socket.on('leave-room', onLeaveRoom);
+        socket.on('update-spotify-room', onUpdateSpotifyRoom);
 
         return () => {
             socket.off('join-room', onJoinRoom);
             socket.off('leave-room', onLeaveRoom);
+            socket.off('update-spotify-room', onUpdateSpotifyRoom);
         }
-    }, [navigate])
+    }, [])
 
     return (
         <>
