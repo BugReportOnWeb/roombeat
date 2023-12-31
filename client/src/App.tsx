@@ -108,18 +108,18 @@ const App = () => {
             setRoom(updatedRoom);
         }
 
-        const onUpdateSpotifyRoom = (updatedRoom: Room) => {
+        const onPopulateSpotifyRoom = (updatedRoom: Room) => {
             setRoom(updatedRoom);
         }
 
         socket.on('join-room', onJoinRoom);
         socket.on('leave-room', onLeaveRoom);
-        socket.on('update-spotify-room', onUpdateSpotifyRoom);
+        socket.on('populate-spotify-room', onPopulateSpotifyRoom);
 
         return () => {
             socket.off('join-room', onJoinRoom);
             socket.off('leave-room', onLeaveRoom);
-            socket.off('update-spotify-room', onUpdateSpotifyRoom);
+            socket.off('populate-spotify-room', onPopulateSpotifyRoom);
         }
     }, [])
 

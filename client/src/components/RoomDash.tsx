@@ -14,7 +14,7 @@ const RoomDash = ({ username, room, leaveRoom }: RoomProps) => {
             <h1>{username} - {room.id}</h1>
             <button onClick={leaveRoom} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Leave Room</button>
             <Members members={room.members} />
-            <SpotifyDataBlock spotify={room.spotify} />
+            <SpotifyDataBlock room={room} />
         </div>
     )
 }

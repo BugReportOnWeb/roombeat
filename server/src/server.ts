@@ -141,16 +141,24 @@ io.on('connection', socket => {
         console.log(rooms);
     })
 
-    socket.on('update-spotify-room', (updatedRoom: Room) => {
+    socket.on('populate-spotify-room', async (roomId: string) => {
+        const user = await getSpotifyUserData(authToken);
+        const playback = await getSpotifyPlaybackData(authToken);
+        const spotify: SpotifyData = { user, playback }
+
+        const room = rooms.find(room => room.id === roomId)!;
+        const updatedRoom: Room = { ...room, spotify }
+
         rooms = rooms.map(room => {
-            return room.id === updatedRoom.id
+            return room.id === roomId
                 ? updatedRoom
                 : room
         })
 
-        io.to(updatedRoom.id).emit('update-spotify-room', updatedRoom);
+        io.to(roomId).emit('populate-spotify-room', updatedRoom);
 
         // DEGUGGING/LOGGING
+        console.log(currentUser, socket.id, 'populated spotify data in room', roomId);
         console.log(rooms);
     })
 
