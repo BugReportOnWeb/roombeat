@@ -1,13 +1,10 @@
-import { SpotifyUser, SpotifyPlayback } from "./spotify";
+import { SpotifyData } from "./spotify";
 
 type Room = {
     id: string;
     owner: string;
     members: string[];
-    spotify?: {
-        user: SpotifyUser;
-        playback?: SpotifyPlayback
-    }
+    spotify?: SpotifyData 
 }
 
 export type { Room };

@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
 import { SpotifyData } from "../types/spotify";
-// import { SpotifyUser, SpotifyPlayback } from "../types/spotify";
 
-// type SpotifyDataBlockProp = {
-//     spotify: {
-//         user: SpotifyUser;
-//         playback: SpotifyPlayback;
-//     }
-// }
+type SpotifyDataBlockProp = {
+    spotify?: SpotifyData 
+}
 
-const SpotifyDataBlock = () => {
+const SpotifyDataBlock = ({ spotify }: SpotifyDataBlockProp) => {
     const [spotifyData, setSpotifyData] = useState<SpotifyData>();
     const [error, setError] = useState('');
-
-    console.log(spotifyData);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -35,8 +29,8 @@ const SpotifyDataBlock = () => {
             }
         }
 
-        fetchData();
-    }, [])
+        if (!spotify) fetchData();
+    }, [spotify])
 
     return (
         <>

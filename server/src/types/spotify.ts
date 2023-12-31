@@ -21,4 +21,8 @@ type SpotifyData = {
     playback: SpotifyPlayback;
 }
 
-export type { SpotifyUser, SpotifyPlayback, SpotifyData };
+export type {
+    SpotifyData,
+    SpotifyUser,
+    SpotifyPlayback
+}
