@@ -11,6 +11,7 @@ dotenv.config();
 import log from './middleware/log';
 import { Room } from './types/room';
 import { roomIdGenerator } from './lib/util';
+import { getSpotifyUserDetails } from './lib/spotify';
 
 const SERVER_PORT = process.env.SERVER_PORT as string;
 const CLIENT_PORT = process.env.CLIENT_PORT as string;
@@ -55,7 +56,8 @@ io.on('connection', socket => {
         const newRoom: Room = {
             id: roomIdGenerator(),
             owner: owner.trim(),
-            members: [owner.trim()]
+            members: [owner.trim()],
+            spotifyData: await getSpotifyUserDetails(authToken),
         }
 
         currentUser = newRoom.owner;

@@ -34,6 +34,7 @@ const App = () => {
 
         try {
             const authURL = await getAuthURL(username);
+            console.log(authURL);
             document.location = authURL;
         } catch (error) {
             if (error instanceof Error) {

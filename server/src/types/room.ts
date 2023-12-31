@@ -1,7 +1,10 @@
+import { SpotifyData } from "./spotify";
+
 type Room = {
     id: string;
     owner: string;
     members: string[];
+    spotifyData: SpotifyData;
 }
 
 type TokenDetails = {

@@ -1,7 +1,35 @@
 import { TokenDetails } from "../types/room";
+import { SpotifyData } from "../types/spotify";
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID as string;
 // const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET as string;
+
+const getSpotifyUserDetails = async (token: string) => {
+    try {
+        const res = await fetch('https://api.spotify.com/v1/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+
+        const data = await res.json();
+        console.log(data);
+
+        if (!res.ok) {
+            throw new Error(data.error);
+        }
+
+        const userDetails: SpotifyData = { 
+            display_name: data.display_name,
+            email: data.email
+        };
+
+        return userDetails;
+    } catch (error) {
+        throw error;
+    }
+}
 
 const getSpotifyAcessToken = async (): Promise<TokenDetails> => {
     try {
@@ -60,4 +88,4 @@ const getSpotifyProfileData = async (tokenDetails: TokenDetails) => {
     }
 }
 
-export { getSpotifyAcessToken, getSpotifyProfileData };
+export { getSpotifyAcessToken, getSpotifyProfileData, getSpotifyUserDetails };
