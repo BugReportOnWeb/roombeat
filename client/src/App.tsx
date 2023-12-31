@@ -1,5 +1,5 @@
 // Core
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
 // Components
@@ -7,14 +7,13 @@ import RoomDash from "./components/RoomDash";
 import ErrorBlock from "./components/ErrorBlock";
 
 // Extras
-import { Room, RoomContextType } from "./types/room";
+import { Room } from "./types/room";
 import { socket } from "./socket/socket";
 import { validateRoomId, validateUsername } from "./lib/validation";
 import { getAuthURL } from "./lib/spotify";
-import { RoomContext } from "./context/RoomContext";
 
 const App = () => {
-    const { room, setRoom } = useContext(RoomContext) as RoomContextType;
+    const [room, setRoom] = useState<Room | null>(null);
     const [username, setUsername] = useState('');
     const [error, setError] = useState('');
     const roomIdRef = useRef<HTMLInputElement | null>(null);
