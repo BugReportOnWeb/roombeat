@@ -8,7 +8,7 @@ type RoomProps = {
     leaveRoom: () => void;
 }
 
-const RoomDash = ({ username, room, leaveRoom }: RoomProps) => {
+const Dashboard = ({ username, room, leaveRoom }: RoomProps) => {
     return (
         <div className='flex flex-col gap-3 w-fit'>
             <h1>{username} - {room.id}</h1>
@@ -19,4 +19,4 @@ const RoomDash = ({ username, room, leaveRoom }: RoomProps) => {
     )
 }
 
-export default RoomDash;
+export default Dashboard;
