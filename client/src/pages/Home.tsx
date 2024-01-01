@@ -10,7 +10,7 @@ import { RoomContext } from "../context/RoomContext";
 // Extras
 import { Room, RoomContextType } from "../types/room";
 import { socket } from "../socket/socket";
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../components/dashboard/Dashboard";
 import { Link } from "react-router-dom";
 
 const Home = () => {
@@ -34,6 +34,7 @@ const Home = () => {
         socket.emit('create-room', username);
     }
 
+    // TODO: Move inside where needed
     const leaveRoom = () => {
         resetStates();
         socket.emit('leave-room', room?.id)
@@ -119,20 +120,15 @@ const Home = () => {
                     <div className='flex flex-col gap-7 text-center'>
                         <h1 className='text-5xl font-extrabold uppercase tracking-[0.2rem]'>Roombeat</h1>
                         <div className='flex gap-3'>
-                            <Link to='/create-room' className='inline-flex justify-center items-center border border-[#27272a] text-sm px-4 py-3 w-full h-fit rounded-lg cursor-pointer hover:bg-[#27272a]'>Create Room</Link>
-                            <Link to='/join-room' className='inline-flex justify-center items-center border border-[#27272a] text-sm px-4 py-3 w-full h-fit rounded-lg cursor-pointer hover:bg-[#27272a]'>Join Room</Link>
+                            <Link to='/create-room' className='inline-flex justify-center items-center border border-[#27272a] text-sm px-4 py-3 w-full h-fit rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#27272a]'>Create Room</Link>
+                            <Link to='/join-room' className='inline-flex justify-center items-center border border-[#27272a] text-sm px-4 py-3 w-full h-fit rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#27272a]'>Join Room</Link>
                         </div>
                     </div> 
                 </div>
             )}
 
             {error && console.log(error)}
-
-            {room && <Dashboard
-                username={username}
-                room={room}
-                leaveRoom={leaveRoom}
-            />}
+            {room && <Dashboard room={room} leaveRoom={leaveRoom} />}
         </>
     )
 }

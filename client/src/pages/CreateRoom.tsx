@@ -50,8 +50,8 @@ const CreateRoom = () => {
                 />
                 <p className='text-[#A1A1AA] text-xs'>This is your public display name</p>
                 <div className='flex gap-3 mt-3'>
-                    <div onClick={validateUser} className='inline-flex justify-center items-center bg-[#FAFAFA] text-[#18181B] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer hover:bg-[#FAFAFA]/80'>Create</div>
-                    <Link to='/' className='inline-flex justify-center items-center border border-[#27272a] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer hover:bg-[#27272a]'>Back</Link>
+                    <div onClick={validateUser} className='inline-flex justify-center items-center bg-[#FAFAFA] text-[#18181B] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#FAFAFA]/80'>Create</div>
+                    <Link to='/' className='inline-flex justify-center items-center border border-[#27272a] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#27272a]'>Back</Link>
                 </div>
                 {error && <ErrorBlock error={error} />}
             </div>

@@ -30,6 +30,10 @@ const JoinRoom = () => {
             return;
         }
 
+        // BUG/TODO: Getting some glitch UI thing
+        // Navigate first -> Data update next
+        // Maybe route to /dashboard rather than '/'
+        // Check if valid in /dashbaord ?? navigate -> '/'
         socket.connect()
         socket.emit('join-room', roomId, username);
         navigate('/');
@@ -63,8 +67,8 @@ const JoinRoom = () => {
                 />
                 <p className='text-[#A1A1AA] text-xs'>Enter the ID of the room to join</p>
                 <div className='flex gap-3 mt-3'>
-                    <div onClick={joinRoom} className='inline-flex justify-center items-center bg-[#FAFAFA] text-[#18181B] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer hover:bg-[#FAFAFA]/80'>Join</div>
-                    <Link to='/' className='inline-flex justify-center items-center border border-[#27272a] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer hover:bg-[#27272a]'>Back</Link>
+                    <div onClick={joinRoom} className='inline-flex justify-center items-center bg-[#FAFAFA] text-[#18181B] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#FAFAFA]/80'>Join</div>
+                    <Link to='/' className='inline-flex justify-center items-center border border-[#27272a] px-3.5 py-2 w-20 h-fit text-sm rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#27272a]'>Back</Link>
                 </div>
                 {error && <ErrorBlock error={error} />}
             </div>

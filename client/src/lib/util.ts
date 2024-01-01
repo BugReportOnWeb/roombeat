@@ -14,4 +14,10 @@ const roomIdGenerator = () => {
     return roomId;
 }
 
-export { roomIdGenerator };
+const delay = (miliseconds: number) => {
+    return new Promise(resolve => {
+        setTimeout(() => resolve('Done'), miliseconds);
+    })
+}
+
+export { roomIdGenerator, delay };
