@@ -91,6 +91,7 @@ const App = () => {
             navigate('/');
         }
 
+        // TODO: All these 'updatedRoom' on can be into one socket event;
         const onJoinRoom = (updatedRoom: Room) => {
             setRoom(updatedRoom);
         }
@@ -111,16 +112,38 @@ const App = () => {
             setRoom(updatedRoom);
         }
 
+        const onSkipPreviousSpotifyRoom = (updatedRoom: Room) => {
+            setRoom(updatedRoom);
+        }
+
+        const onSkipNextSpotifyRoom = (updatedRoom: Room) => {
+            setRoom(updatedRoom);
+        }
+
+        const onPlayPauseSpotifyRoom = (updatedRoom: Room) => {
+            setRoom(updatedRoom);
+        }
+
+        // Room Related
         socket.on('join-room', onJoinRoom);
         socket.on('leave-room', onLeaveRoom);
+
+        // Spotify Related
         socket.on('populate-spotify-room', onPopulateSpotifyRoom);
+        socket.on('skip-previous-spotify-room', onSkipPreviousSpotifyRoom);
+        socket.on('skip-next-spotify-room', onSkipNextSpotifyRoom);
+        socket.on('play-pause-spotify-room', onPlayPauseSpotifyRoom);
 
         return () => {
             socket.off('join-room', onJoinRoom);
             socket.off('leave-room', onLeaveRoom);
+
             socket.off('populate-spotify-room', onPopulateSpotifyRoom);
+            socket.off('skip-previous-spotify-room', onSkipPreviousSpotifyRoom);
+            socket.off('skip-next-spotify-room', onSkipNextSpotifyRoom);
+            socket.off('play-pause-spotify-room', onPlayPauseSpotifyRoom);
         }
-    }, [])
+    }, [navigate])
 
     return (
         <>

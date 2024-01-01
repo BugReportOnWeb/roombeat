@@ -9,6 +9,18 @@ type SpotifyDataBlockProp = {
 const SpotifyDataBlock = ({ room }: SpotifyDataBlockProp) => {
     const spotifyData = room.spotify;
 
+    const skipToPrevious = () => {
+        socket.emit('skip-previous-spotify-room', room.id);
+    }
+
+    const skipToNext = () => {
+        socket.emit('skip-next-spotify-room', room.id);
+    }
+
+    const playPause = () => {
+        socket.emit('play-pause-spotify-room', room.id, spotifyData?.playback.is_playing);
+    }
+
     useEffect(() => {
         if (!room.spotify) {
             socket.emit('populate-spotify-room', room.id)
@@ -40,6 +52,16 @@ const SpotifyDataBlock = ({ room }: SpotifyDataBlockProp) => {
                     </div>
 
                     <hr />
+
+                    <div className='flex flex-col gap-2'>
+                        <div className='flex gap-2'>
+                            <button onClick={skipToPrevious} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Prev</button>
+                            <button onClick={skipToNext} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>Next</button>
+                        </div>
+                        <button onClick={playPause} className='border border-gray-500 px-3 py-2 rounded-lg mt-3 hover:bg-gray-900'>
+                            {spotifyData.playback.is_playing ? 'Pause' : 'Play'}
+                        </button>
+                    </div>
                 </div>
             )}
         </>

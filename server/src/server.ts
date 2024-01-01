@@ -11,8 +11,15 @@ dotenv.config();
 import log from './middleware/log';
 import { Room } from './types/room';
 import { roomIdGenerator } from './lib/util';
-import { getSpotifyPlaybackData, getSpotifyUserData } from './lib/spotify';
+
+// Spotify
 import { SpotifyData } from './types/spotify';
+import {
+    getSpotifyPlaybackData,
+    getSpotifyUserData,
+    playPause, skipToNext,
+    skipToPreivous
+} from './lib/spotify';
 
 const SERVER_PORT = process.env.SERVER_PORT as string;
 const CLIENT_PORT = process.env.CLIENT_PORT as string;
@@ -40,7 +47,6 @@ let rooms: Room[] = [];
 // ------------------
 // SOCKET STUFF HERE
 // ------------------
-
 
 io.on('connection', socket => {
     let currentUser = ''
@@ -162,6 +168,63 @@ io.on('connection', socket => {
         console.log(rooms);
     })
 
+    socket.on('skip-previous-spotify-room', async (roomId: string) => {
+        const spotify = await skipToPreivous(authToken);
+
+        const room = rooms.find(room => room.id === roomId)!;
+        const updatedRoom: Room = { ...room, spotify }
+
+        rooms = rooms.map(room => {
+            return room.id === roomId
+                ? updatedRoom
+                : room
+        })
+
+        io.to(roomId).emit('skip-previous-spotify-room', updatedRoom);
+
+        // DEGUGGING/LOGGING
+        console.log(currentUser, socket.id, 'skipped to previous in room', roomId);
+        console.log(rooms);
+    })
+
+    socket.on('skip-next-spotify-room', async (roomId: string) => {
+        const spotify = await skipToNext(authToken);
+
+        const room = rooms.find(room => room.id === roomId)!;
+        const updatedRoom: Room = { ...room, spotify }
+
+        rooms = rooms.map(room => {
+            return room.id === roomId
+                ? updatedRoom
+                : room
+        })
+
+        io.to(roomId).emit('skip-next-spotify-room', updatedRoom);
+
+        // DEGUGGING/LOGGING
+        console.log(currentUser, socket.id, 'skipped to next in room', roomId);
+        console.log(rooms);
+    })
+
+    socket.on('play-pause-spotify-room', async (roomId: string, isPlaying: boolean) => {
+        const spotify = await playPause(authToken, isPlaying);
+
+        const room = rooms.find(room => room.id === roomId)!;
+        const updatedRoom: Room = { ...room, spotify }
+
+        rooms = rooms.map(room => {
+            return room.id === roomId
+                ? updatedRoom
+                : room
+        })
+
+        io.to(roomId).emit('play-pause-spotify-room', updatedRoom);
+
+        // DEGUGGING/LOGGING
+        console.log(currentUser, socket.id, `${isPlaying ? 'paused' : 'played'} in room`, roomId);
+        console.log(rooms);
+    });
+
     socket.on('disconnect', () => {
         console.log(socket.id, 'disconnected');
     })
@@ -197,10 +260,12 @@ app.get('/api/spotify/data', async (_req, res) => {
 app.get('/api/spotify/auth', async (req, res) => {
     const { username } = req.query;
 
+    const scope = 'user-read-private user-read-email user-read-playback-state user-modify-playback-state';
+
     const params = new URLSearchParams();
     params.append('client_id', SPOTIFY_CLIENT_ID);
     params.append('response_type', 'code');
-    params.append('scope', 'user-read-private user-read-email user-read-playback-state');
+    params.append('scope', scope);
     params.append('redirect_uri', REDIRECT_URI);
 
     try {
