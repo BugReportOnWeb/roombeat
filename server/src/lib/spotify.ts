@@ -50,7 +50,9 @@ const getSpotifyPlaybackData = async (token: string) => {
             is_playing: data.is_playing,
             name: data.item.name,
             images: data.item.album.images,
-            artists: artistsInfo.map(artist => artist.name)
+            artists: artistsInfo.map(artist => artist.name),
+            duration: data.item.duration_ms,
+            popularity: data.item.popularity
         }
 
         return playbackDetails;

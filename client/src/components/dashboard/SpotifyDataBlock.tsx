@@ -1,3 +1,4 @@
+import { millisToMinutesAndSeconds } from "../../lib/util";
 import { SpotifyData } from "../../types/spotify";
 
 type SpotifyDataBlockProps = {
@@ -21,8 +22,21 @@ const SpotifyDataBlock = ({ spotifyData }: SpotifyDataBlockProps) => {
                         {spotifyData?.playback.name}
                     </h1>
                     <h1>
-                        <span className='font-semibold'>Artists:</span>{' '}
+                        <span className='font-semibold'>
+                            {(spotifyData?.playback.artists.length ?? 0) > 1
+                                ? 'Artists:'
+                                : 'Artist:'
+                            }
+                        </span>{' '}
                         {spotifyData?.playback.artists.toString()}
+                    </h1>
+                    <h1>
+                        <span className='font-semibold'>Duration:</span>{' '}
+                        {millisToMinutesAndSeconds(spotifyData?.playback.duration ?? 0)}
+                    </h1>
+                    <h1>
+                        <span className='font-semibold'>Popularity:</span>{' '}
+                        {spotifyData?.playback.popularity}/100
                     </h1>
                     <div className='border border-[#27272A] my-2'></div>
                     <h1>

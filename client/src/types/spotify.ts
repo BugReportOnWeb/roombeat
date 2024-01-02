@@ -15,6 +15,8 @@ type SpotifyPlayback = {
     name: string;
     images: SpotifyPlaybackImage[];
     artists: string[];
+    popularity: number;
+    duration: number;
 }
 
 type SpotifyData = {

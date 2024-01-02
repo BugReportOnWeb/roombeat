@@ -20,4 +20,11 @@ const delay = (miliseconds: number) => {
     })
 }
 
-export { roomIdGenerator, delay };
+const millisToMinutesAndSeconds = (miliseconds: number) => {
+  const minutes = Math.floor(miliseconds / 60000);
+  const seconds = ((miliseconds % 60000) / 1000).toFixed(0);
+  const time = minutes + 'min ' + (parseInt(seconds) < 10 ? '0' : '') + seconds + 'sec';
+  return  time;
+}
+
+export { roomIdGenerator, delay, millisToMinutesAndSeconds };
