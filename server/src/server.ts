@@ -21,6 +21,7 @@ import {
     skipToPreivous
 } from './lib/spotify';
 
+// TODO: Use theses vars wherever neccerary (controllers/lib)
 const SERVER_PORT = process.env.SERVER_PORT as string;
 const CLIENT_PORT = process.env.CLIENT_PORT as string;
 const HOST = process.env.HOST as string;
@@ -42,6 +43,8 @@ app.use(cors());
 app.use(express.json());
 app.use(log);
 
+// TODO: Create DB dir for all these DB stuff
+// Helps in using them throughtout the server
 let rooms: Room[] = [];
 
 // ------------------
@@ -53,21 +56,15 @@ io.on('connection', socket => {
     console.log(socket.id, 'connected');
 
     socket.on('create-room', async (owner: string) => {
-        // Username validation 
         if (!owner || owner.length < 2) {
             socket.disconnect();
             return;
         };
 
-        // TODO: Add spotfy details here
         const newRoom: Room = {
             id: roomIdGenerator(),
             owner: owner.trim(),
             members: [owner.trim()],
-            // spotify: {
-            //     user: await getSpotifyUserDetails(authToken),
-            //     playback: await getSpotifyPlaybackData(authToken)
-            // }
         }
 
         currentUser = newRoom.owner;
@@ -229,9 +226,10 @@ io.on('connection', socket => {
         console.log(socket.id, 'disconnected');
     })
 
-    // TODO: Try something like this in future
-    // socket.on('create-room', (room: Room) => createRoom(socket, rooms, currentUser, room));
-    // socket.on('leave-room', (room: Room) => leaveRoom(socket, rooms, currentUser, room));
+    // TODO: Gotta move every event into a different file
+    // Try something like this in future
+    // socket.on('create-room', (room: Room) => createRoom(room));
+    // socket.on('leave-room', (room: Room) => leaveRoom(room));
 })
 
 
@@ -242,9 +240,12 @@ io.on('connection', socket => {
 
 let authUsername = '';
 // TODO: Store authTokem in a key-value form
+// REAL BIG BUG HERE BECAUSE OF THIS!!!!
 // roomID - token
 let authToken = '';
 
+
+// TODO: Move all the calls the their respective routes and controllers
 app.get('/api/spotify/data', async (_req, res) => {
     try {
         const user = await getSpotifyUserData(authToken);
