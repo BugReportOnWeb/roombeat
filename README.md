@@ -2,18 +2,6 @@
 
 Roombeat is a collaborative music-sharing platform that allows users to listen to Spotify together in real-time within designated rooms. Users can control playback, view current song details, and manage rooms.
 
-## Technologies Used
-
-- **Client-Side**:
-  - React
-  - TypeScript
-  - Socket.io (for real-time communication)
-
-- **Server-Side**:
-  - Express.js
-  - TypeScript
-  - Socket.io (for real-time communication with the client)
-
 ## Features
 
 - **Spotify Authentication**: Users can authenticate their Spotify accounts to access the shared music room.
