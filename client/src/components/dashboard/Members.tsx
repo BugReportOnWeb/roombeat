@@ -10,7 +10,7 @@ const Members = ({ members }: MembersProps) => {
     const { username } = useContext(UsernameContext) as UsernameContextType;
 
     return (
-        <div className='text-center w-fit'>
+        <div className='text-center min-w-fit'>
             <h1 className='font-bold text-3xl mb-4'>Joined Members</h1>
             {members.map((member, index) => (
                 <div key={index}>

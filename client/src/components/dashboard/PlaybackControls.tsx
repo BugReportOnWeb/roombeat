@@ -22,7 +22,7 @@ const PlaybackControls = ({ room, leaveRoom }: PlaybackControlsProps) => {
     }
 
     return (
-        <div className='text-center'>
+        <div className='text-center min-w-fit'>
             <h1 className='font-bold text-3xl mb-5'>Playback Controls</h1>
             <div className='flex flex-col gap-3'>
                 <div className='flex gap-2'>
