@@ -3,17 +3,29 @@ type SpotifyUser = {
     email: string
 }
 
-type SpotifyPlaybackImage = {
+type SpotifyRawPlaybackImage = {
     url: string;
     height: number;
     width: number;
+}
+
+type SpotifyRawPlaybackArtist = {
+    external_urls: {
+        spotify: string
+    },
+    href: string,
+    id: string,
+    name: string,
+    type: string,
+    uri: string
 }
 
 type SpotifyPlayback = {
     device_name: string;
     is_playing: boolean;
     name: string;
-    images: SpotifyPlaybackImage[];
+    images: SpotifyRawPlaybackImage[];
+    artists: string[];
 }
 
 type SpotifyData = {
@@ -24,5 +36,6 @@ type SpotifyData = {
 export type {
     SpotifyData,
     SpotifyUser,
-    SpotifyPlayback
+    SpotifyPlayback,
+    SpotifyRawPlaybackArtist
 }

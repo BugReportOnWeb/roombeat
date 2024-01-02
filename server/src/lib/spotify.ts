@@ -1,4 +1,4 @@
-import { SpotifyData, SpotifyPlayback, SpotifyUser } from "../types/spotify";
+import { SpotifyData, SpotifyPlayback, SpotifyRawPlaybackArtist, SpotifyUser } from "../types/spotify";
 
 const getSpotifyUserData = async (token: string) => {
     try {
@@ -27,6 +27,8 @@ const getSpotifyUserData = async (token: string) => {
 }
 
 const getSpotifyPlaybackData = async (token: string) => {
+    console.log(token);
+
     try {
         const res = await fetch('https://api.spotify.com/v1/me/player', {
             method: 'GET',
@@ -41,11 +43,14 @@ const getSpotifyPlaybackData = async (token: string) => {
             throw new Error(data.error);
         }
 
+        const artistsInfo: SpotifyRawPlaybackArtist[] = data.item.artists;
+
         const playbackDetails: SpotifyPlayback = {
             device_name: data.device.name,
             is_playing: data.is_playing,
             name: data.item.name,
-            images: data.item.album.images
+            images: data.item.album.images,
+            artists: artistsInfo.map(artist => artist.name)
         }
 
         return playbackDetails;

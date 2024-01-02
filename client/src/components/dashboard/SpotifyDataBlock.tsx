@@ -21,6 +21,11 @@ const SpotifyDataBlock = ({ spotifyData }: SpotifyDataBlockProps) => {
                         {spotifyData?.playback.name}
                     </h1>
                     <h1>
+                        <span className='font-semibold'>Artists:</span>{' '}
+                        {spotifyData?.playback.artists.toString()}
+                    </h1>
+                    <div className='border border-[#27272A] my-2'></div>
+                    <h1>
                         <span className='font-semibold'>Playing on:</span>{' '}
                         {spotifyData?.playback.device_name}
                     </h1>

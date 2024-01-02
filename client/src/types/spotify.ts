@@ -14,6 +14,7 @@ type SpotifyPlayback = {
     is_playing: boolean;
     name: string;
     images: SpotifyPlaybackImage[];
+    artists: string[];
 }
 
 type SpotifyData = {
