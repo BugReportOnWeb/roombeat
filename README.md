@@ -68,3 +68,7 @@ After starting the server and client, the application can be accessed at [http:/
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or pull requests for any improvements or additional features.
+
+## License
+
+This project is licensed under the [GNU General Public License version 3.0](LICENSE.md).
