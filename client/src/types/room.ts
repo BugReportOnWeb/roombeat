@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { SpotifyData } from "./spotify";
 
 type Room = {
@@ -8,9 +7,4 @@ type Room = {
     spotify?: SpotifyData;
 }
 
-type RoomContextType = {
-    room: Room | null;
-    setRoom: Dispatch<SetStateAction<Room | null>>;
-}
-
-export type { Room, RoomContextType };
+export type { Room };

@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState } from "react";
-import { Room, RoomContextType } from "../types/room";
+import { Room } from "../types/room";
+import { RoomContextType } from "../types/context";
 
 type RoomContextProp = {
     children: ReactNode;

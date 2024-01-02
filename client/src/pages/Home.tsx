@@ -1,20 +1,22 @@
 // Core
 import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 // Context
 import { UsernameContext } from "../context/UsernameContext";
-import { UsernameContextType } from "../types/context";
+import { RoomContextType, UsernameContextType } from "../types/context";
 import { RoomContext } from "../context/RoomContext";
 
-// Extras
-import { Room, RoomContextType } from "../types/room";
-import { socket } from "../socket/socket";
+// Components
 import Dashboard from "../components/dashboard/Dashboard";
-import { Link } from "react-router-dom";
+import ErrorBlock from "../components/ErrorBlock";
+
+// Extras
+import { Room } from "../types/room";
+import { socket } from "../socket/socket";
 
 const Home = () => {
-    const { username, setUsername } = useContext(UsernameContext) as UsernameContextType;
+    const { setUsername } = useContext(UsernameContext) as UsernameContextType;
     const { room, setRoom } = useContext(RoomContext) as RoomContextType;
 
     const [error, setError] = useState('');
@@ -124,10 +126,10 @@ const Home = () => {
                             <Link to='/join-room' className='inline-flex justify-center items-center border border-[#27272a] text-sm px-4 py-3 w-full h-fit rounded-lg cursor-pointer transition-colors ease-in-out hover:bg-[#27272a]'>Join Room</Link>
                         </div>
                     </div> 
+                    {error && <ErrorBlock error={error} />}
                 </div>
             )}
 
-            {error && console.log(error)}
             {room && <Dashboard room={room} leaveRoom={leaveRoom} />}
         </>
     )

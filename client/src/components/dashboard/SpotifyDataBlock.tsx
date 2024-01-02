@@ -10,9 +10,7 @@ const SpotifyDataBlock = ({ spotifyData }: SpotifyDataBlockProps) => {
         <div className='flex h-fit gap-5'>
             <img
                 src={spotifyData?.playback.images[1].url}
-                width={spotifyData?.playback.images[1].width}
-                height={spotifyData?.playback.images[1].height}
-                className='rounded-lg'
+                className='rounded-lg w-[350px] h-[350px]'
             />
             <div className='font-sm'>
                 <h1 className='font-bold text-2xl mb-3'>Song Details</h1>
@@ -28,7 +26,7 @@ const SpotifyDataBlock = ({ spotifyData }: SpotifyDataBlockProps) => {
                                 : 'Artist:'
                             }
                         </span>{' '}
-                        {spotifyData?.playback.artists.toString()}
+                        {spotifyData?.playback.artists.join(', ')}
                     </h1>
                     <h1>
                         <span className='font-semibold'>Duration:</span>{' '}

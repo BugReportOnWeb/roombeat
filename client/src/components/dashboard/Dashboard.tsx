@@ -24,7 +24,7 @@ const Dashboard = ({ room, leaveRoom }: RoomProps) => {
                     {room.owner}'s Music Room{' '}
                     <span className='text-sm font-normal'>({room.id})</span>
                 </h1>
-                <div className='flex justify-between gap-10'>
+                <div className='flex justify-between gap-12'>
                     <SpotifyDataBlock spotifyData={room.spotify} />
                     <div className='min-w-fit flex flex-col items-center gap-10'>
                         <PlaybackControls room={room} leaveRoom={leaveRoom} />

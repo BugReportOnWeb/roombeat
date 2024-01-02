@@ -1,8 +1,14 @@
 import { Dispatch, SetStateAction } from "react";
+import { Room } from "./room";
 
 type UsernameContextType = {
     username: string;
     setUsername: Dispatch<SetStateAction<string>>;
 }
 
-export type { UsernameContextType };
+type RoomContextType = {
+    room: Room | null;
+    setRoom: Dispatch<SetStateAction<Room | null>>;
+}
+
+export type { UsernameContextType, RoomContextType };
