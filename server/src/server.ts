@@ -162,7 +162,7 @@ io.on('connection', socket => {
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'populated spotify data in room', roomId);
-        console.log(rooms);
+        // console.log(rooms);
     })
 
     socket.on('skip-previous-spotify-room', async (roomId: string) => {
@@ -181,7 +181,7 @@ io.on('connection', socket => {
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'skipped to previous in room', roomId);
-        console.log(rooms);
+        // console.log(rooms);
     })
 
     socket.on('skip-next-spotify-room', async (roomId: string) => {
@@ -200,7 +200,7 @@ io.on('connection', socket => {
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, 'skipped to next in room', roomId);
-        console.log(rooms);
+        // console.log(rooms);
     })
 
     socket.on('play-pause-spotify-room', async (roomId: string, isPlaying: boolean) => {
@@ -219,7 +219,7 @@ io.on('connection', socket => {
 
         // DEGUGGING/LOGGING
         console.log(currentUser, socket.id, `${isPlaying ? 'paused' : 'played'} in room`, roomId);
-        console.log(rooms);
+        // console.log(rooms);
     });
 
     socket.on('disconnect', () => {

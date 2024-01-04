@@ -1,6 +1,6 @@
 import { SpotifyData, SpotifyPlayback, SpotifyRawPlaybackArtist, SpotifyUser } from "../types/spotify";
 
-const getSpotifyUserData = async (token: string) => {
+const getSpotifyUserData = async (token: string): Promise<SpotifyUser> => {
     try {
         const res = await fetch('https://api.spotify.com/v1/me', {
             method: 'GET',
@@ -8,6 +8,12 @@ const getSpotifyUserData = async (token: string) => {
                 'Authorization': `Bearer ${token}`
             }
         })
+
+        if (res.status === 204) {
+            console.log('AGAIN IN THE SYSTEM USER');
+            const userDetailsAgain = await getSpotifyUserData(token);
+            return userDetailsAgain;
+        }
 
         const data = await res.json();
 
@@ -26,9 +32,7 @@ const getSpotifyUserData = async (token: string) => {
     }
 }
 
-const getSpotifyPlaybackData = async (token: string) => {
-    console.log(token);
-
+const getSpotifyPlaybackData = async (token: string): Promise<SpotifyPlayback> => {
     try {
         const res = await fetch('https://api.spotify.com/v1/me/player', {
             method: 'GET',
@@ -36,6 +40,12 @@ const getSpotifyPlaybackData = async (token: string) => {
                 'Authorization': `Bearer ${token}`
             }
         })
+
+        if (res.status === 204) {
+            console.log('AGAIN IN THE SYSTEM PLAYBACK');
+            const playbackDetailsAgain = await getSpotifyPlaybackData(token);
+            return playbackDetailsAgain;
+        }
 
         const data = await res.json();
 
